@@ -127,7 +127,7 @@
 .general-message-image.is-dragging{cursor:grabbing}
 .general-message-image.is-dragging img{transition:none}
 .general-source-language{justify-content:space-between}
-.general-message-copy{padding:var(--ic-gap);font-size:1.875cqw;line-height:1.388889;white-space:pre-line;overflow-wrap:anywhere}
+.general-message-copy{padding:var(--ic-gap);font-size:1.875cqw;line-height:1.388889;white-space:normal;overflow-wrap:anywhere}
 .general-message-copy p{margin:0 0 var(--ic-gap)}
 .general-message-copy>p:first-child:has(>br:only-child){margin-bottom:0}
 .general-message-copy ul,.general-message-copy ol{margin:0 0 var(--ic-gap);padding-inline-start:2.15cqw}

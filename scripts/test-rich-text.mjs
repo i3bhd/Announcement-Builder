@@ -11,6 +11,20 @@ try {
   const js = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
   await page.setContent('<div id="editor" contenteditable="true"></div><button id="list">List</button>');
   await page.addScriptTag({ content: js });
+  const css = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
+  await page.addStyleTag({ content: css.match(/\.general-message-copy\{[^}]+\}/)[0] });
+  const spacing = await page.evaluate(() => {
+    const preview = document.createElement('div');
+    preview.className = 'general-message-copy';
+    preview.innerHTML = '<p>First<br>Second</p><ol><li>Third</li></ol>' + '\n'.repeat(100);
+    document.body.appendChild(preview);
+    const fixed = preview.getBoundingClientRect().height;
+    preview.style.whiteSpace = 'pre-line';
+    const old = preview.getBoundingClientRect().height;
+    preview.remove();
+    return { fixed, old };
+  });
+  assert.ok(spacing.old > spacing.fixed * 5, 'Source HTML whitespace must not inflate the template');
   const result = await page.evaluate(() => {
     const cases = {};
     const rich = sanitizeRichHtml('<p style="font-family:Arial;font-size:12pt;margin-bottom:12pt;line-height:18pt"><span style="font-weight:bold;font-style:italic;text-decoration:underline;color:rgb(255,0,0)">Hello</span><br>World</p>');

@@ -2124,6 +2124,7 @@ export default function Home() {
               {can('export.pdf') && <button onClick={exportPdf}><Printer /> PDF <small>Complete one-page document</small></button>}
             </div>}
           </div>}
+          {(can('users.manage') || can('roles.manage')) && <a className="audit-nav-link" href="/admin"><Settings2 /> Users & roles</a>}
           <AccountMenu />
         </div>
       </header>
@@ -2141,12 +2142,12 @@ export default function Home() {
           <div inert={!can('announcement.edit') || !workspaceReady}>
           <div className="section-rule"><span>Choose template</span></div>
           <div className="template-switch" role="radiogroup" aria-label="Message template">
-            <button type="button" role="radio" disabled={!can('template.service')} aria-checked={announcement.template === 'service'} className={announcement.template === 'service' ? 'active' : ''} onClick={() => chooseTemplate('service')}>
+            {can('template.service') && <button type="button" role="radio" aria-checked={announcement.template === 'service'} className={announcement.template === 'service' ? 'active' : ''} onClick={() => chooseTemplate('service')}>
               <b>Service announcement</b><span>Vendor, impact and schedule</span>
-            </button>
-            <button type="button" role="radio" disabled={!can('template.general')} aria-checked={announcement.template === 'general'} className={announcement.template === 'general' ? 'active' : ''} onClick={() => chooseTemplate('general')}>
+            </button>}
+            {can('template.general') && <button type="button" role="radio" aria-checked={announcement.template === 'general'} className={announcement.template === 'general' ? 'active' : ''} onClick={() => chooseTemplate('general')}>
               <b>General bilingual message</b><span>Flexible internal communication</span>
-            </button>
+            </button>}
           </div>
 
           {announcement.template === 'service' ? <>

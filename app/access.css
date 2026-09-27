@@ -11,3 +11,10 @@
 .workspace-loading{padding:12px 24px;color:#5b7668;font-size:14px}
 .template-switch button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:850px){.login-brand{min-height:0;padding:24px}.login-logo{width:120px}.login-brand-copy{margin:22px 0 10px}.login-brand-copy .login-kicker,.login-brand-copy h1,.login-brand-footer{display:none}.login-brand-copy>p{margin:0;font-size:22px}.login-content{padding:28px 24px}.login-icon{display:none}.login-card h2{font-size:30px}.login-card>p{margin-bottom:20px}.login-copyright{margin-top:28px}}
+
+/* Account popovers are solid surfaces, including outside the app shell portal. */
+.account-popover{background:#fff!important;color:#183b35;opacity:1;border:1px solid #dce4df;box-shadow:0 16px 40px rgba(21,38,31,.16)}
+.account-popover>a,.account-popover form button{padding:10px;border-radius:8px}
+.account-popover>a:hover,.account-popover form button:hover{background:#edf5f1}
+.account-permission-hint{font-size:12px;line-height:1.5;color:#66736d;margin:8px 0;padding-top:10px;border-top:1px solid #e4ebe6}
+.template-switch:has(>button:only-child){grid-template-columns:1fr}

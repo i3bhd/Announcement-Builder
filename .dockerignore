@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+dist
+.next
+.vinext
+.wrangler
+.openai
+.env
+.env.*
+data
+outputs
+*.sqlite*
+*.tsbuildinfo
+*.log
+.DS_Store

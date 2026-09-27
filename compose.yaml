@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    image: tamam-announcement-builder:local
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+      DATA_DIR: /app/data
+      NODE_ENV: production
+    volumes:
+      - tamam-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  tamam-data:

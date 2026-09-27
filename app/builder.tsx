@@ -412,6 +412,7 @@ function newAnnouncementFor(template: TemplateKey): Announcement {
     next.template = 'general';
     next.name = 'New announcement';
     next.headerLabel = { ...GENERAL_HEADER_LABEL };
+    next.footerLabel = { en: 'Department name', ar: 'اسم القسم' };
   }
   return next;
 }
@@ -1636,6 +1637,11 @@ export default function Home() {
     if (template === announcement.template) return;
     patchAnnouncement({
       template,
+      ...(template === 'general' &&
+        announcement.footerLabel.en === 'Information Technology' &&
+        announcement.footerLabel.ar === 'تقنية المعلومات'
+        ? { footerLabel: { en: 'Department name', ar: 'اسم القسم' } }
+        : {}),
       headerLabel: template === 'service'
         ? { ...statusTemplates[announcement.status].title }
         : { ...GENERAL_HEADER_LABEL },

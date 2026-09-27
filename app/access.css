@@ -22,3 +22,4 @@
 .admin-role-card .admin-role-actions{margin-top:auto;display:flex;justify-content:flex-start;flex-wrap:wrap;gap:10px}
 .admin-role-card .role-delete-button{color:#aa2347;border-color:#efd1d9}
 .admin-role-card .role-delete-button:hover{background:#fff2f4}
+.access-dialog [data-slot="alert-dialog-footer"]{border-top:0}

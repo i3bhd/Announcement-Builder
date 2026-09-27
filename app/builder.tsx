@@ -373,8 +373,8 @@ function newAnnouncementFor(template: TemplateKey): Announcement {
   return next;
 }
 
-const Field = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (
-  <label className="field">
+const Field = ({ label, hint, children, dir }: { label: string; hint?: string; children: React.ReactNode; dir?: 'rtl' | 'ltr' }) => (
+  <label className="field" dir={dir}>
     <span>{label}{hint && <small>{hint}</small>}</span>
     {children}
   </label>
@@ -2191,7 +2191,7 @@ export default function Home() {
           <div className="section-rule"><span>Header</span></div>
           <div className="form-grid header-fields">
             <Field label="Header label"><Input value={announcement.headerLabel?.en || ''} onChange={(event) => patchPair('headerLabel', 'en', event.target.value)} /></Field>
-            <Field label="نص الترويسة"><Input dir="rtl" value={announcement.headerLabel?.ar || ''} onChange={(event) => patchPair('headerLabel', 'ar', event.target.value)} /></Field>
+            <Field label="نص الترويسة" dir="rtl"><Input dir="rtl" value={announcement.headerLabel?.ar || ''} onChange={(event) => patchPair('headerLabel', 'ar', event.target.value)} /></Field>
           </div>
 
           <div className="section-rule"><span>Bilingual message</span></div>
@@ -2262,7 +2262,7 @@ export default function Home() {
             <div className="section-rule"><span>Header</span></div>
             <div className="form-grid header-fields">
               <Field label="Header label"><Input value={announcement.headerLabel?.en || ''} onChange={(event) => patchPair('headerLabel', 'en', event.target.value)} /></Field>
-              <Field label="نص الترويسة"><Input dir="rtl" value={announcement.headerLabel?.ar || ''} onChange={(event) => patchPair('headerLabel', 'ar', event.target.value)} /></Field>
+              <Field label="نص الترويسة" dir="rtl"><Input dir="rtl" value={announcement.headerLabel?.ar || ''} onChange={(event) => patchPair('headerLabel', 'ar', event.target.value)} /></Field>
             </div>
 
             <div className="section-rule"><span>Bilingual message</span></div>
@@ -2290,7 +2290,7 @@ export default function Home() {
           <div className="section-rule"><span>Footer</span></div>
           <div className="form-grid footer-fields">
             <Field label="Footer label"><Input value={announcement.footerLabel.en} onChange={(event) => patchPair('footerLabel', 'en', event.target.value)} /></Field>
-            <Field label="نص التذييل"><Input dir="rtl" value={announcement.footerLabel.ar} onChange={(event) => patchPair('footerLabel', 'ar', event.target.value)} /></Field>
+            <Field label="نص التذييل" dir="rtl"><Input dir="rtl" value={announcement.footerLabel.ar} onChange={(event) => patchPair('footerLabel', 'ar', event.target.value)} /></Field>
             <Field label="Website"><Input value={announcement.footerWebsite} onChange={(event) => patchAnnouncement({ footerWebsite: event.target.value })} /></Field>
           </div>
           </div>

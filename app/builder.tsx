@@ -13,6 +13,8 @@ import {
   ImageDown,
   ImagePlus,
   Italic,
+  List,
+  ListOrdered,
   Pencil,
   Plus,
   Printer,
@@ -602,7 +604,7 @@ function RichTextEditor({
   const [colorSelectionRects, setColorSelectionRects] = useState<Array<{ left: number; top: number; width: number; height: number }>>([]);
   const [pickerHsv, setPickerHsv] = useState<HsvColor>({ h: 160, s: 83, v: 46 });
   const [hexDraft, setHexDraft] = useState('#147653');
-  const [activeFormats, setActiveFormats] = useState({ bold: false, italic: false, underline: false });
+  const [activeFormats, setActiveFormats] = useState({ bold: false, italic: false, underline: false, bullets: false, numbering: false });
 
   useEffect(() => {
     if (activeEditor === editorId) return;
@@ -805,6 +807,8 @@ function RichTextEditor({
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
+      bullets: document.queryCommandState('insertUnorderedList'),
+      numbering: document.queryCommandState('insertOrderedList'),
     });
     setShowToolbar(true);
   };
@@ -830,7 +834,7 @@ function RichTextEditor({
     onChange(html);
   };
 
-  const convertAsteriskToBullet = () => {
+  const convertListMarker = () => {
     const editor = editorRef.current;
     const selection = window.getSelection();
     if (!editor || !selection || selection.rangeCount === 0 || !selection.isCollapsed) return false;
@@ -846,10 +850,11 @@ function RichTextEditor({
     const markerRange = document.createRange();
     markerRange.selectNodeContents(currentBlock);
     markerRange.setEnd(range.startContainer, range.startOffset);
-    if (markerRange.toString() !== '*') return false;
+    const marker = markerRange.toString();
+    if (marker !== '*' && marker !== '1.' && marker !== '١.') return false;
     markerRange.deleteContents();
 
-    const list = document.createElement('ul');
+    const list = document.createElement(marker === '*' ? 'ul' : 'ol');
     const item = document.createElement('li');
     while (currentBlock.firstChild) item.appendChild(currentBlock.firstChild);
     if (!item.textContent && !item.querySelector('br')) item.appendChild(document.createElement('br'));
@@ -867,7 +872,7 @@ function RichTextEditor({
     return true;
   };
 
-  const applyFormat = (command: 'bold' | 'italic' | 'underline' | 'removeFormat') => {
+  const applyFormat = (command: 'bold' | 'italic' | 'underline' | 'removeFormat' | 'insertUnorderedList' | 'insertOrderedList') => {
     resetHistoryGrouping();
     const selection = window.getSelection();
     if (selection && savedRange.current) {
@@ -1076,6 +1081,8 @@ function RichTextEditor({
       <button type="button" title="Bold" aria-label="Bold" aria-pressed={activeFormats.bold} disabled={!showToolbar} onMouseDown={(event) => { event.preventDefault(); applyFormat('bold'); }}><Bold /></button>
       <button type="button" title="Italic" aria-label="Italic" aria-pressed={activeFormats.italic} disabled={!showToolbar} onMouseDown={(event) => { event.preventDefault(); applyFormat('italic'); }}><Italic /></button>
       <button type="button" title="Underline" aria-label="Underline" aria-pressed={activeFormats.underline} disabled={!showToolbar} onMouseDown={(event) => { event.preventDefault(); applyFormat('underline'); }}><Underline /></button>
+      <button type="button" title="Bulleted list" aria-label="Bulleted list" aria-pressed={activeFormats.bullets} disabled={!showToolbar} onMouseDown={(event) => event.preventDefault()} onClick={() => applyFormat('insertUnorderedList')}><List /></button>
+      <button type="button" title="Numbered list" aria-label="Numbered list" aria-pressed={activeFormats.numbering} disabled={!showToolbar} onMouseDown={(event) => event.preventDefault()} onClick={() => applyFormat('insertOrderedList')}><ListOrdered /></button>
       <span />
       <div className="text-color-swatches" aria-label="Text colors">
         {QUICK_TEXT_COLORS.map((color) => (
@@ -1266,7 +1273,7 @@ function RichTextEditor({
           return;
         }
         if (event.key === 'Escape') hideToolbar();
-        if (event.key === ' ' && !event.metaKey && !event.ctrlKey && !event.altKey && convertAsteriskToBullet()) {
+        if (event.key === ' ' && !event.metaKey && !event.ctrlKey && !event.altKey && convertListMarker()) {
           event.preventDefault();
           hideToolbar();
           return;

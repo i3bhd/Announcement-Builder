@@ -110,8 +110,8 @@ const currentRiyadhDate = () => {
 };
 
 const GENERAL_HEADER_LABEL: Pair = {
-  en: 'Information Technology',
-  ar: 'تقنية المعلومات',
+  en: 'Announcement title',
+  ar: 'عنوان الإعلان',
 };
 
 const DEFAULT_SELECTED_INTEGRATION_IDS = ['cashout-repayment', 'loan'];
@@ -286,13 +286,10 @@ const emptyAnnouncement = (): Announcement => {
   extraTitle: { en: '', ar: '' },
   extraBody: { en: '', ar: '' },
   generalMessage: {
-    en: '<p><strong>Dear Colleagues,</strong></p><p>As a reminder, your official email signature is <strong>automatically added to outgoing emails</strong>, so there is no need to add it manually.</p><p>The signature may not be visible to you when sending an email, <strong>but it will appear to the recipient automatically</strong>.</p><p>Thank you for your cooperation.</p><p>Best regards,</p>',
-    ar: '<p><strong>الزميلات والزملاء الأعزاء،</strong></p><p>نود التذكير بأن <strong>توقيع البريد الإلكتروني الرسمي يُضاف تلقائياً إلى جميع الرسائل الصادرة</strong>، لذلك لا يتطلب الأمر منكم إضافة التوقيع أو إعداده يدوياً.</p><p>يرجى العلم أن التوقيع لن يكون ظاهراً دائماً أثناء كتابة أو إرسال البريد الإلكتروني، <strong>إلا أنه سيُضاف تلقائياً ويظهر للمستلم عند استلام الرسالة</strong>.</p><p>شكراً لتعاونكم.</p><p>مع أطيب التحيات،</p>',
+    en: '<p><strong>Dear Colleagues,</strong></p><p>Write your announcement here. Include the key details and any action required.</p>',
+    ar: '<p><strong>الزميلات والزملاء الأعزاء،</strong></p><p>اكتب إعلانك هنا، مع توضيح التفاصيل الأساسية وأي إجراء مطلوب.</p>',
   },
-  generalContact: {
-    en: 'For further information, please contact the Technology Support team',
-    ar: 'للمزيد من المعلومات، يرجى التواصل مع فريق الدعم التقني',
-  },
+  generalContact: { en: '', ar: '' },
   generalImage: null,
   };
 };
@@ -396,8 +393,8 @@ function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
     selectedIntegrationIds,
     impacts,
     generalMessage: {
-      en: legacyMessageToHtml(draft.generalMessage?.en || fallback.generalMessage.en),
-      ar: legacyMessageToHtml(draft.generalMessage?.ar || fallback.generalMessage.ar),
+      en: legacyMessageToHtml(draft.generalMessage?.en ?? fallback.generalMessage.en),
+      ar: legacyMessageToHtml(draft.generalMessage?.ar ?? fallback.generalMessage.ar),
     },
     generalContact: draft.generalContact || fallback.generalContact,
     generalImage,
@@ -413,7 +410,7 @@ function newAnnouncementFor(template: TemplateKey): Announcement {
   const next = emptyAnnouncement();
   if (template === 'general') {
     next.template = 'general';
-    next.name = 'Email signature reminder';
+    next.name = 'New announcement';
     next.headerLabel = { ...GENERAL_HEADER_LABEL };
   }
   return next;
@@ -1643,7 +1640,7 @@ export default function Home() {
         ? { ...statusTemplates[announcement.status].title }
         : { ...GENERAL_HEADER_LABEL },
       name: template === 'general'
-        ? 'Email signature reminder'
+        ? 'New announcement'
         : currentVendor
           ? vendorAnnouncementName(currentVendor.name.en, announcement.status)
           : 'Service announcement',

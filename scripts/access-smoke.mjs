@@ -69,6 +69,16 @@ await request('/api/workspace/drafts', { cookie: marketing, body: { ...draft, te
 await request('/api/access/roles', { cookie: adminCookie, body: { ...custom, permissions: ['dashboard.view'] } });
 await request('/api/access/authorize', { cookie: marketing, body: { permission: 'export.png' }, expected: 401 });
 console.log('PASS: custom roles, password reset, template/export restrictions, role-change revocation');
+await request('/api/access/roles', { method: 'DELETE', body: { id: 'viewer' }, expected: 401 });
+await request('/api/access/roles', { cookie: adminCookie, method: 'DELETE', body: { id: 'admin' }, expected: 403 });
+await request('/api/access/roles', { cookie: adminCookie, method: 'DELETE', body: { id: 'viewer' }, expected: 409 });
+await request('/api/access/roles', { cookie: adminCookie, body: { name: 'Disposable test role', description: '', permissions: ['dashboard.view'] } });
+const disposable = (await request('/api/access/admin', { cookie: adminCookie })).body.roles.find(r => r.name === 'Disposable test role');
+assert.equal(disposable.assignedCount, 0);
+await request('/api/access/roles', { cookie: adminCookie, method: 'DELETE', body: { id: disposable.id } });
+await request('/api/access/roles', { cookie: adminCookie, method: 'DELETE', body: { id: disposable.id }, expected: 404 });
+assert.ok(!(await request('/api/access/admin', { cookie: adminCookie })).body.roles.some(r => r.id === disposable.id));
+console.log('PASS: role deletion, assigned-role protection and administrator protection');
 await request('/api/access/logout', { cookie: adminCookie, method: 'POST', expected: 303 });
 await request('/api/access/admin', { cookie: adminCookie, expected: 401 });
 console.log('PASS: sign-out invalidates the session');

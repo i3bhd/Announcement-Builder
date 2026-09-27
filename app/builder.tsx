@@ -2124,7 +2124,6 @@ export default function Home() {
               {can('export.pdf') && <button onClick={exportPdf}><Printer /> PDF <small>Complete one-page document</small></button>}
             </div>}
           </div>}
-          {(can('users.manage') || can('roles.manage')) && <a className="audit-nav-link" href="/admin"><Settings2 /> Users & roles</a>}
           <AccountMenu />
         </div>
       </header>

@@ -12,7 +12,7 @@ export async function GET(_request: Request, context: Context) {
     const user = await requireUser();
     if (action === 'admin') {
       if (!hasPermission(user, 'users.manage') && !hasPermission(user, 'roles.manage')) throw new AccessError('Access denied.');
-      const roles = await database().prepare('SELECT id, name, description, permissions FROM access_roles ORDER BY name').all<{ id: string; name: string; description: string; permissions: string }>();
+      const roles = await database().prepare('SELECT r.id, r.name, r.description, r.permissions, (SELECT COUNT(*) FROM access_users u WHERE u.role_id = r.id) AS assignedCount FROM access_roles r ORDER BY r.name').all<{ id: string; name: string; description: string; permissions: string; assignedCount: number }>();
       const users = hasPermission(user, 'users.manage') ? (await database().prepare('SELECT id, name, username, role_id AS roleId, active, must_change_password AS mustChangePassword, created_at AS createdAt FROM access_users ORDER BY name').all()).results : [];
       return json({ users, roles: roles.results.map(role => ({ ...role, permissions: JSON.parse(role.permissions) })) });
     }
@@ -134,5 +134,23 @@ export async function POST(request: Request, context: Context) {
       return json({ ok: true });
     }
     return json({ error: 'Not found.' }, 404);
+  } catch (error) { return failure(error); }
+}
+
+export async function DELETE(request: Request, context: Context) {
+  try {
+    sameOrigin(request);
+    const user = await requireUser('roles.manage');
+    if ((await context.params).action !== 'roles') throw new AccessError('Not found.', 404);
+    const body = await readBody(request);
+    if (typeof body.id !== 'string' || !body.id) throw new AccessError('Choose a role.', 400);
+    if (body.id === 'admin') throw new AccessError('The Administrator role cannot be deleted.');
+    const role = await database().prepare('SELECT id, permissions FROM access_roles WHERE id = ?').bind(body.id).first<{ id: string; permissions: string }>();
+    if (!role) throw new AccessError('This role no longer exists.', 404);
+    if (!user.isAdmin && JSON.parse(role.permissions).some((p: Permission) => !hasPermission(user, p))) throw new AccessError('You cannot delete a role with greater access than your own.');
+    // Conditional deletion also protects against an assignment made after the dialog opened.
+    const result = await database().prepare("DELETE FROM access_roles WHERE id = ? AND id != 'admin' AND NOT EXISTS (SELECT 1 FROM access_users WHERE role_id = ?)").bind(role.id, role.id).run();
+    if (!result.meta.changes) throw new AccessError('Reassign all accounts using this role before deleting it, including disabled accounts.', 409);
+    return json({ ok: true });
   } catch (error) { return failure(error); }
 }

@@ -18,3 +18,7 @@
 .account-popover>a:hover,.account-popover form button:hover{background:#edf5f1}
 .account-permission-hint{font-size:12px;line-height:1.5;color:#66736d;margin:8px 0;padding-top:10px;border-top:1px solid #e4ebe6}
 .template-switch:has(>button:only-child){grid-template-columns:1fr}
+
+.admin-role-card .admin-role-actions{margin-top:auto;display:flex;justify-content:flex-start;flex-wrap:wrap;gap:10px}
+.admin-role-card .role-delete-button{color:#aa2347;border-color:#efd1d9}
+.admin-role-card .role-delete-button:hover{background:#fff2f4}

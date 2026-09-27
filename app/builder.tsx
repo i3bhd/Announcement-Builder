@@ -1278,12 +1278,15 @@ function RichTextEditor({
           hideToolbar();
           return;
         }
-        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+        if (event.key === 'Enter' && !event.altKey && !event.nativeEvent.isComposing) {
           event.preventDefault();
           hideToolbar();
           resetHistoryGrouping();
-          document.execCommand('insertLineBreak', false);
+          // Enter is a soft break; Shift+Enter creates a paragraph or next list item.
+          // Preserve the existing Ctrl/Cmd+Enter soft-break shortcut.
+          document.execCommand(event.shiftKey && !modifier ? 'insertParagraph' : 'insertLineBreak', false);
           publishValue();
+          requestAnimationFrame(rememberSelection);
         }
       }}
       onKeyUp={(event) => { if (event.key !== 'Escape') requestAnimationFrame(rememberSelection); }}

@@ -31,6 +31,7 @@ import {
 import EmojiPicker, { EmojiStyle, Theme, type EmojiClickData } from 'emoji-picker-react';
 import emojiRegex from 'emoji-regex';
 import { toPng } from 'html-to-image';
+import { sanitizeRichHtml, clipboardRichHtml } from '@/lib/rich-text';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -322,54 +323,6 @@ function legacyMessageToHtml(value: string) {
   )).join(''));
 }
 
-function sanitizeRichHtml(value: string) {
-  const template = document.createElement('template');
-  template.innerHTML = value;
-  const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'EM', 'U', 'B', 'I', 'UL', 'OL', 'LI', 'IMG']);
-  Array.from(template.content.querySelectorAll('*')).reverse().forEach((element) => {
-    const color = element.tagName === 'FONT'
-      ? element.getAttribute('color') || ''
-      : element.tagName === 'SPAN'
-        ? (element as HTMLElement).style.color
-        : '';
-    const safeColor = /^#[0-9a-f]{3,8}$/i.test(color)
-      || /^rgba?\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i.test(color)
-      ? color
-      : '';
-    const emojiSource = element.tagName === 'IMG' ? element.getAttribute('src') || '' : '';
-    const emojiAlt = element.tagName === 'IMG' ? element.getAttribute('alt') || '' : '';
-    const emojiTitle = element.tagName === 'IMG' ? element.getAttribute('title') || 'Emoji' : '';
-    const isSafeAppleEmoji = /^https:\/\/cdn\.jsdelivr\.net\/npm\/emoji-datasource-apple(?:@[^/]+)?\/img\/apple\/64\/[0-9a-f-]+\.png$/i.test(emojiSource);
-    Array.from(element.attributes).forEach((attribute) => element.removeAttribute(attribute.name));
-    if (element.tagName === 'IMG') {
-      if (!isSafeAppleEmoji || !emojiAlt) {
-        element.remove();
-        return;
-      }
-      element.setAttribute('src', emojiSource);
-      element.setAttribute('alt', emojiAlt);
-      element.setAttribute('title', emojiTitle);
-      element.setAttribute('class', 'inline-apple-emoji');
-      element.setAttribute('draggable', 'false');
-    } else if (element.tagName === 'FONT' || element.tagName === 'SPAN') {
-      if (!safeColor) {
-        element.replaceWith(...Array.from(element.childNodes));
-        return;
-      }
-      const replacement = document.createElement('span');
-      replacement.style.color = safeColor;
-      Array.from(element.childNodes).forEach(child => replacement.appendChild(child));
-      element.replaceWith(replacement);
-    } else if (element.tagName === 'B' || element.tagName === 'I') {
-      const replacement = document.createElement(element.tagName === 'B' ? 'strong' : 'em');
-      Array.from(element.childNodes).forEach(child => replacement.appendChild(child));
-      element.replaceWith(replacement);
-    } else if (!allowed.has(element.tagName)) {
-      element.replaceWith(...Array.from(element.childNodes));
-    }
-  });
-  return template.innerHTML;
-}
 
 function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
   const fallback = emptyAnnouncement();
@@ -874,11 +827,16 @@ function RichTextEditor({
 
   const applyFormat = (command: 'bold' | 'italic' | 'underline' | 'removeFormat' | 'insertUnorderedList' | 'insertOrderedList') => {
     resetHistoryGrouping();
+    const editor = editorRef.current;
     const selection = window.getSelection();
-    if (selection && savedRange.current) {
-      selection.removeAllRanges();
-      selection.addRange(savedRange.current);
-    }
+    if (!editor || !selection) return;
+    const liveRange = selection.rangeCount ? selection.getRangeAt(0) : null;
+    const range = liveRange && editor.contains(liveRange.commonAncestorContainer)
+      ? liveRange.cloneRange() : savedRange.current?.cloneRange();
+    if (!range || !editor.contains(range.commonAncestorContainer)) return;
+    editor.focus({ preventScroll: true });
+    selection.removeAllRanges();
+    selection.addRange(range);
     document.execCommand(command, false);
     publishValue();
     requestAnimationFrame(rememberSelection);
@@ -1292,7 +1250,8 @@ function RichTextEditor({
       onKeyUp={(event) => { if (event.key !== 'Escape') requestAnimationFrame(rememberSelection); }}
       onBlur={() => window.setTimeout(() => {
         const activeElement = document.activeElement;
-        const focusStayedInToolbar = activeElement instanceof Node && shellRef.current?.contains(activeElement);
+        const focusStayedInToolbar = activeElement instanceof Node &&
+          (shellRef.current?.contains(activeElement) || toolbarHost?.contains(activeElement));
         if (!colorPickerActive.current && !emojiPickerActive.current && !focusStayedInToolbar) {
           setShowToolbar(false);
           setHasTextSelection(false);
@@ -1301,8 +1260,10 @@ function RichTextEditor({
       onPaste={(event) => {
         event.preventDefault();
         resetHistoryGrouping();
-        document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));
+        const html = clipboardRichHtml(event.clipboardData.getData('text/html'), event.clipboardData.getData('text/plain'));
+        document.execCommand('insertHTML', false, html);
         publishValue();
+        requestAnimationFrame(rememberSelection);
       }}
     />
     </div>

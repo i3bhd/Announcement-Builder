@@ -402,7 +402,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   position:relative;
   min-height:82px;
   gap:5px;
-  padding:15px 17px;
+  padding:15px 40px 15px 17px;
   overflow:hidden;
   border-color:#d7e2dc;
   border-radius:14px;
@@ -411,10 +411,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 .template-switch button:hover{border-color:#80bda3;background:#f8fcfa;box-shadow:0 8px 24px rgba(16,76,50,.075);transform:translateY(-1px)}
 .template-switch button.active{
-  border-color:#239169;
-  background:linear-gradient(135deg,#f0faf5 0%,#eaf7f1 100%);
-  box-shadow:inset 4px 0 0 #17845e,0 8px 22px rgba(15,119,81,.09);
+  border-color:#92b7a5;
+  background:#f5faf7;
+  box-shadow:none;
 }
+.template-selected-check{position:absolute;right:15px;top:17px;width:16px;height:16px;color:#287454;pointer-events:none}
 .template-switch b{font-size:15px;font-weight:650;line-height:1.25}
 .template-switch span{font-size:12px;line-height:1.3;color:#75837c}
 

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import {
   BarChart3,
   Bold,
+  Check,
   ChevronDown,
   Copy,
   Download,
@@ -2117,9 +2118,11 @@ export default function Home() {
           <div className="template-switch" role="radiogroup" aria-label="Message template">
             {can('template.service') && <button type="button" role="radio" aria-checked={announcement.template === 'service'} className={announcement.template === 'service' ? 'active' : ''} onClick={() => chooseTemplate('service')}>
               <b>Service announcement</b><span>Vendor, impact and schedule</span>
+              {announcement.template === 'service' && <Check className="template-selected-check" aria-hidden="true" />}
             </button>}
             {can('template.general') && <button type="button" role="radio" aria-checked={announcement.template === 'general'} className={announcement.template === 'general' ? 'active' : ''} onClick={() => chooseTemplate('general')}>
               <b>General bilingual message</b><span>Flexible internal communication</span>
+              {announcement.template === 'general' && <Check className="template-selected-check" aria-hidden="true" />}
             </button>}
           </div>
 

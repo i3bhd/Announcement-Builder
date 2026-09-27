@@ -176,6 +176,10 @@
 .shared-message-toolbar-label{display:flex;align-items:center;gap:6px;color:#53635b;font-size:10px;font-weight:750;white-space:nowrap}
 .shared-message-toolbar-label svg{width:14px;height:14px;color:#147653}
 .shared-message-toolbar-host{min-width:0}
+.shared-message-toolbar .editor-toolbar-frame{max-width:100%;overflow:visible}
+.shared-message-toolbar .selection-toolbar{flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;box-sizing:border-box}
+.shared-message-toolbar .selection-toolbar>button,.shared-message-toolbar .selection-toolbar>span{flex-shrink:0}
+.shared-message-toolbar .text-color-swatches{min-width:0;max-width:100%;flex-wrap:wrap}
 .rich-editor-shell{position:relative;min-width:0;border:1px solid var(--input);border-radius:11px;background:#fbfcfb;transition:border-color .15s ease,box-shadow .15s ease}
 .rich-editor-shell.is-active{border-color:var(--ring);box-shadow:0 0 0 3px rgba(42,155,115,.14)}
 .editor-toolbar-frame{position:relative;z-index:4;min-width:0;display:flex;align-items:center;justify-content:flex-start;gap:9px;direction:ltr}

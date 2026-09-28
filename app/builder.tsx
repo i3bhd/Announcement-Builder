@@ -16,6 +16,7 @@ import {
   Italic,
   List,
   ListOrdered,
+  Palette,
   Pencil,
   Plus,
   Printer,
@@ -1069,7 +1070,8 @@ function RichTextEditor({
               if (!isChoosingColor) prepareColorPicker();
             }}
           >
-            <span aria-hidden="true" />
+            <Palette aria-hidden="true" />
+            <span className="custom-text-color-accent" aria-hidden="true" />
           </PopoverTrigger>
           <PopoverContent className="custom-color-panel" side="bottom" sideOffset={10} align="center">
           <div className="custom-color-title">Custom text color</div>

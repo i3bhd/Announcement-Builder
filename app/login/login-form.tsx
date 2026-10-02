@@ -37,10 +37,10 @@ export default function LoginForm({ setup }: { setup: boolean }) {
       <div className="login-icon">{setup ? <ShieldCheck /> : <LockKeyhole />}</div>
       <span className="login-kicker">{setup ? 'IT ADMINISTRATOR' : 'TEAM ACCESS'}</span>
       <h2>{setup ? 'Set up your workspace' : 'Welcome back'}</h2>
-      <p>{setup ? 'Create the IT administrator password. You can then add department accounts and decide what each team can access.' : 'Sign in with the department account provided by IT.'}</p>
+      {setup && <p>Create the IT administrator password. You can then add department accounts and decide what each team can access.</p>}
       <form onSubmit={submit}>
         {setup && <><label htmlFor="setup-token">Server setup key</label><Input id="setup-token" type="password" autoComplete="off" value={setupToken} onChange={e => setSetupToken(e.target.value)} required /><small className="access-hint">Use the one-time key configured by your server administrator.</small></>}
-        <label htmlFor="username">Username</label><Input id="username" autoComplete="username" autoCapitalize="none" spellCheck={false} value={username} onChange={e => setUsername(e.target.value)} readOnly={setup} placeholder="e.g. marketing" required maxLength={40} />
+        <label htmlFor="username">Username</label><Input id="username" autoComplete="username" autoCapitalize="none" spellCheck={false} value={username} onChange={e => setUsername(e.target.value)} readOnly={setup} required maxLength={40} />
         <label htmlFor="password">{setup ? 'Create password' : 'Password'}</label><div className="password-input"><Input id="password" type={show ? 'text' : 'password'} autoComplete={setup ? 'new-password' : 'current-password'} minLength={setup ? 12 : undefined} maxLength={128} value={password} onChange={e => setPassword(e.target.value)} required /><button type="button" aria-label={show ? 'Hide password' : 'Show password'} onClick={() => setShow(!show)}>{show ? <EyeOff /> : <Eye />}</button></div>
         {setup && <><small className="access-hint">Use at least 12 characters.</small><label htmlFor="confirm">Confirm password</label><Input id="confirm" type="password" autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} required /></>}
         {error && <p className="access-error" role="alert">{error}</p>}

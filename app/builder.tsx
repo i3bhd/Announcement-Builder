@@ -276,7 +276,7 @@ const emptyAnnouncement = (): Announcement => {
   selectedIntegrationIds: [...DEFAULT_SELECTED_INTEGRATION_IDS],
   headerLabel: { ...statusTemplates.planned.title },
   footerLabel: { en: 'Information Technology', ar: 'تقنية المعلومات' },
-  footerWebsite: 'www.tamam.life',
+  footerWebsite: 'www.tamamfinance.sa',
   title: { ...statusTemplates.planned.title },
   intro: { ...statusTemplates.planned.intro },
   summary: { en: 'ANB services will be unavailable', ar: 'تعطل مؤقت في خدمات البنك العربي الوطني' },
@@ -487,7 +487,7 @@ const AnnouncementFooter = ({ label, website }: { label?: Pair; website?: string
     en: label?.en ?? 'Information Technology',
     ar: label?.ar ?? 'تقنية المعلومات',
   };
-  const footerWebsite = website ?? 'www.tamam.life';
+  const footerWebsite = website ?? 'www.tamamfinance.sa';
   const accessibleLabel = `${footerLabel.en} / ${footerLabel.ar} — ${footerWebsite}`;
 
   return (
@@ -1305,7 +1305,7 @@ function durationLabel(a: Announcement, lang: 'en' | 'ar') {
       if (lastTwoDigits >= 3 && lastTwoDigits <= 10) return plural;
       return singular;
     };
-    const hourText = hours ? `${hours} ${arabicUnit(hours, 'ساعة', 'ساعتان', 'ساعات')}` : '';
+    const hourText = hours === 2 ? 'ساعتان' : hours ? `${hours} ${arabicUnit(hours, 'ساعة', 'ساعتان', 'ساعات')}` : '';
     const minuteText = rest ? `${rest} ${arabicUnit(rest, 'دقيقة', 'دقيقتان', 'دقائق')}` : '';
     return [hourText, minuteText].filter(Boolean).join(' و');
   }

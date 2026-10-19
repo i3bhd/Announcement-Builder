@@ -57,7 +57,7 @@ type Pair = { en: string; ar: string };
 type Impact = Pair & { id: string; integrationId?: string };
 type Integration = { id: string; name: Pair; impact: Pair; note?: 'Confirmed' | 'Vendor mapping needs confirmation' };
 type Vendor = { id: string; name: Pair; summary?: Pair; integrations: Integration[] };
-type StatusKey = 'planned' | 'interruption' | 'restored' | 'postponed' | 'cancelled';
+type StatusKey = 'planned' | 'upgrade' | 'interruption' | 'restored' | 'postponed' | 'cancelled';
 type TemplateKey = 'service' | 'general';
 type PendingDraftDelete = { draft: Announcement; order: string[]; token: string; expiresAt: number };
 type GeneralImage = {
@@ -126,6 +126,11 @@ const statusTemplates: Record<StatusKey, { label: Pair; title: Pair; intro: Pair
     label: { en: 'Planned maintenance', ar: 'صيانة مجدولة' },
     title: { en: 'Planned Service Maintenance', ar: 'تنبيه صيانة مجدولة' },
     intro: { en: 'There is planned service maintenance as follows:', ar: 'نحيطكم علمًا بوجود صيانة مجدولة حسب التفاصيل التالية:' },
+  },
+  upgrade: {
+    label: { en: 'Service upgrade', ar: 'ترقية الخدمة' },
+    title: { en: 'Service Upgrade', ar: 'إشعار ترقية الخدمة' },
+    intro: { en: 'There is a service upgrade as follows:', ar: 'نحيطكم علمًا بترقية الخدمة حسب التفاصيل التالية:' },
   },
   interruption: {
     label: { en: 'Service interruption', ar: 'انقطاع في الخدمة' },
@@ -2311,7 +2316,7 @@ export default function Home() {
                 </header>
                 <div className="source-spacer" />
                 <dl className="source-details">
-                  <div><dt>Status</dt><dd>{announcement.source === 'vendor' ? `${currentVendor?.name.en.split('—')[0].trim() || vendorSearch} Services Maintenance` : statusTemplates[announcement.status].label.en}</dd></div>
+                  <div><dt>Status</dt><dd>{announcement.source === 'vendor' ? `${currentVendor?.name.en.split('—')[0].trim() || vendorSearch} Services ${announcement.status === 'upgrade' ? 'Upgrade' : 'Maintenance'}` : statusTemplates[announcement.status].label.en}</dd></div>
                   <div><dt>Impact</dt><dd>{announcement.summary.en || '—'}</dd></div>
                   <div><dt>Start Date</dt><dd>{formatDate(announcement.startDate, 'en')}</dd></div>
                   <div><dt>Start Time</dt><dd>{formatTime(announcement.startTime, 'en')}</dd></div>
@@ -2333,7 +2338,7 @@ export default function Home() {
                 </header>
                 <div className="source-spacer" />
                 <dl className="source-details">
-                  <div><dt>الحالة</dt><dd>{announcement.source === 'vendor' ? `صيانة خدمات ${currentVendor?.name.ar || vendorSearch}` : statusTemplates[announcement.status].label.ar}</dd></div>
+                  <div><dt>الحالة</dt><dd>{announcement.source === 'vendor' ? `${announcement.status === 'upgrade' ? 'ترقية' : 'صيانة'} خدمات ${currentVendor?.name.ar || vendorSearch}` : statusTemplates[announcement.status].label.ar}</dd></div>
                   <div><dt>التأثير</dt><dd>{announcement.summary.ar || '—'}</dd></div>
                   <div><dt>تاريخ البداية</dt><dd>{formatDate(announcement.startDate, 'ar')}</dd></div>
                   <div><dt>وقت البداية</dt><dd>{formatTime(announcement.startTime, 'ar')}</dd></div>

@@ -36,6 +36,7 @@ import { AccountMenu } from '@/components/account-menu';
 const statusLabels: Record<string, string> = {
   general: 'General message',
   planned: 'Planned maintenance',
+  upgrade: 'Service upgrade',
   interruption: 'Service interruption',
   restored: 'Service restored',
   postponed: 'Postponed',

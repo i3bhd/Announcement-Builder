@@ -78,6 +78,7 @@ type Announcement = {
   template: TemplateKey;
   name: string;
   status: StatusKey;
+  statusText?: Partial<Pair>;
   source: 'vendor' | 'internal' | 'other';
   vendorId: string;
   selectedIntegrationIds: string[];
@@ -1533,6 +1534,10 @@ export default function Home() {
   const deleteTimerRefs = useRef<Map<string, number>>(new Map());
 
   const currentVendor = vendors.find((vendor) => vendor.id === announcement.vendorId);
+  const statusText: Pair = {
+    en: announcement.statusText?.en ?? (announcement.source === 'vendor' ? `${currentVendor?.name.en.split('—')[0].trim() || vendorSearch} Services ${announcement.status === 'upgrade' ? 'Upgrade' : 'Maintenance'}` : statusTemplates[announcement.status].label.en),
+    ar: announcement.statusText?.ar ?? (announcement.source === 'vendor' ? `${announcement.status === 'upgrade' ? 'ترقية' : 'صيانة'} خدمات ${currentVendor?.name.ar || vendorSearch}` : statusTemplates[announcement.status].label.ar),
+  };
   const managedVendor = vendors.find((vendor) => vendor.id === manageVendorId);
   const sortedVendors = useMemo(() => sortByEnglishName(vendors), [vendors]);
   const sortedCurrentIntegrations = useMemo(() => sortByEnglishName(currentVendor?.integrations || []), [currentVendor]);
@@ -1821,6 +1826,7 @@ export default function Home() {
     patchAnnouncement({
       ...(startsNewDraft ? { id: uid(), updatedAt: undefined } : {}),
       vendorId: vendor.id,
+      statusText: undefined,
       name: vendorAnnouncementName(vendor.name.en, announcement.status),
       selectedIntegrationIds: [],
       impacts: [],
@@ -2142,6 +2148,7 @@ export default function Home() {
                 const status = event.target.value as StatusKey;
                 patchAnnouncement({
                   status,
+                  statusText: undefined,
                   headerLabel: { ...statusTemplates[status].title },
                   name: announcement.source === 'vendor' && currentVendor
                     ? vendorAnnouncementName(currentVendor.name.en, status)
@@ -2158,6 +2165,7 @@ export default function Home() {
                 const source = event.target.value as Announcement['source'];
                 patchAnnouncement({
                   source,
+                  statusText: undefined,
                   title: { ...statusTemplates[announcement.status].title },
                   intro: serviceDescription(announcement.status),
                 });
@@ -2170,6 +2178,15 @@ export default function Home() {
                 {sortedVendors.map((vendor) => <NativeSelectOption key={vendor.id} value={vendor.id}>{vendor.name.en} — {vendor.name.ar}</NativeSelectOption>)}
               </NativeSelect>
             </Field>}
+          </div>
+
+          <div className="form-grid">
+            <Field label="Status text" hint="Shown in the announcement table">
+              <Input value={statusText.en} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, en: event.target.value } })} />
+            </Field>
+            <Field label="نص الحالة">
+              <Input dir="rtl" className="text-right" value={statusText.ar} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, ar: event.target.value } })} />
+            </Field>
           </div>
 
           {announcement.source === 'vendor' && <div className="integration-box">
@@ -2316,7 +2333,7 @@ export default function Home() {
                 </header>
                 <div className="source-spacer" />
                 <dl className="source-details">
-                  <div><dt>Status</dt><dd>{announcement.source === 'vendor' ? `${currentVendor?.name.en.split('—')[0].trim() || vendorSearch} Services ${announcement.status === 'upgrade' ? 'Upgrade' : 'Maintenance'}` : statusTemplates[announcement.status].label.en}</dd></div>
+                  <div><dt>Status</dt><dd>{statusText.en}</dd></div>
                   <div><dt>Impact</dt><dd>{announcement.summary.en || '—'}</dd></div>
                   <div><dt>Start Date</dt><dd>{formatDate(announcement.startDate, 'en')}</dd></div>
                   <div><dt>Start Time</dt><dd>{formatTime(announcement.startTime, 'en')}</dd></div>
@@ -2338,7 +2355,7 @@ export default function Home() {
                 </header>
                 <div className="source-spacer" />
                 <dl className="source-details">
-                  <div><dt>الحالة</dt><dd>{announcement.source === 'vendor' ? `${announcement.status === 'upgrade' ? 'ترقية' : 'صيانة'} خدمات ${currentVendor?.name.ar || vendorSearch}` : statusTemplates[announcement.status].label.ar}</dd></div>
+                  <div><dt>الحالة</dt><dd>{statusText.ar}</dd></div>
                   <div><dt>التأثير</dt><dd>{announcement.summary.ar || '—'}</dd></div>
                   <div><dt>تاريخ البداية</dt><dd>{formatDate(announcement.startDate, 'ar')}</dd></div>
                   <div><dt>وقت البداية</dt><dd>{formatTime(announcement.startTime, 'ar')}</dd></div>

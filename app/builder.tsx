@@ -1315,7 +1315,7 @@ function durationLabel(a: Announcement, lang: 'en' | 'ar') {
     const minuteText = rest ? `${rest} ${arabicUnit(rest, 'دقيقة', 'دقيقتان', 'دقائق')}` : '';
     return [hourText, minuteText].filter(Boolean).join(' و');
   }
-  return [hours ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : '', rest ? `${rest} min` : ''].filter(Boolean).join(' ');
+  return [hours ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : '', rest ? `${rest} ${rest === 1 ? 'minute' : 'minutes'}` : ''].filter(Boolean).join(' ');
 }
 
 function durationMinutes(a: Announcement) {

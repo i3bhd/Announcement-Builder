@@ -2180,15 +2180,6 @@ export default function Home() {
             </Field>}
           </div>
 
-          <div className="form-grid">
-            <Field label="Status text" hint="Shown in the announcement table">
-              <Input value={statusText.en} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, en: event.target.value } })} />
-            </Field>
-            <Field label="نص الحالة">
-              <Input dir="rtl" className="text-right" value={statusText.ar} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, ar: event.target.value } })} />
-            </Field>
-          </div>
-
           {announcement.source === 'vendor' && <div className="integration-box">
             <div className="integration-title"><div><b>Affected services</b><span>Choosing one adds its saved impact automatically.</span></div>{can('vendors.manage') && <Button variant="ghost" size="sm" onClick={() => setVendorDialog(true)}><Plus /> Add missing</Button>}</div>
             <div className="integration-list">
@@ -2222,13 +2213,13 @@ export default function Home() {
           <div className="language-grid">
             <div className="language-column">
               <div className="language-label"><span>EN</span> English</div>
-              <Field label="Title"><Input value={announcement.title.en} onChange={(event) => patchPair('title', 'en', event.target.value)} /></Field>
+              <Field label="Status"><Input value={statusText.en} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, en: event.target.value } })} /></Field>
               <Field label="Description"><Textarea value={announcement.intro.en} onChange={(event) => patchPair('intro', 'en', event.target.value)} /></Field>
               <Field label="Impact summary"><Textarea value={announcement.summary.en} onChange={(event) => patchPair('summary', 'en', event.target.value)} /></Field>
             </div>
             <div className="language-column" dir="rtl">
               <div className="language-label"><span>AR</span> العربية</div>
-              <Field label="العنوان"><Input value={announcement.title.ar} onChange={(event) => patchPair('title', 'ar', event.target.value)} /></Field>
+              <Field label="الحالة"><Input dir="rtl" value={statusText.ar} onChange={(event) => patchAnnouncement({ statusText: { ...announcement.statusText, ar: event.target.value } })} /></Field>
               <Field label="الوصف"><Textarea value={announcement.intro.ar} onChange={(event) => patchPair('intro', 'ar', event.target.value)} /></Field>
               <Field label="ملخص التأثير"><Textarea value={announcement.summary.ar} onChange={(event) => patchPair('summary', 'ar', event.target.value)} /></Field>
             </div>

@@ -1406,7 +1406,7 @@ async function prepareGeneralImage(file: File): Promise<GeneralImage> {
 
 async function renderAnnouncementPng(sourceNode: HTMLElement, transparentBackground = false) {
   const isWhatsApp = sourceNode.classList.contains('whatsapp-template');
-  const exportBackground = isWhatsApp ? '#19d471' : transparentBackground ? 'transparent' : '#fff';
+  const exportBackground = isWhatsApp ? '#1EDC73' : transparentBackground ? 'transparent' : '#fff';
   const exportStage = document.createElement('div');
   exportStage.style.cssText = `position:absolute;left:-100000px;top:0;width:1920px;background:${transparentBackground ? 'transparent' : '#fff'};overflow:visible;`;
 

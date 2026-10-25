@@ -151,9 +151,8 @@
 .whatsapp-banner{display:block;width:100%;height:auto;border-radius:2.6cqw}
 .whatsapp-language{padding:2.777778cqw;background:rgba(255,255,230,.23);border-radius:2.888889cqw;min-width:0;overflow-wrap:anywhere}
 .whatsapp-language h2{margin:0 0 5.555556cqw;font-size:3.777778cqw;font-weight:700;line-height:1.4}
-.field input.whatsapp-emphasis-input{font-weight:700}
 .whatsapp-language h2 strong,.whatsapp-closing strong{font-weight:700;display:inline-block;padding:2.222222cqw;background:rgba(0,108,61,.13);border-radius:1.4cqw}
-.whatsapp-copy.general-message-copy{padding:0;font-size:3.777778cqw;line-height:1.48;font-weight:700}
+.whatsapp-copy.general-message-copy{padding:0;font-size:3.777778cqw;line-height:1.48;font-weight:400}
 .whatsapp-copy.general-message-copy p{margin:0 0 5.555556cqw}
 .whatsapp-copy.general-message-copy p:last-child{margin-bottom:0}
 .whatsapp-copy.general-message-copy ul,.whatsapp-copy.general-message-copy ol{padding-inline-start:5cqw;margin:0 0 5.555556cqw}

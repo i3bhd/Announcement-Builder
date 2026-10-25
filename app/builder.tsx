@@ -58,7 +58,7 @@ type Impact = Pair & { id: string; integrationId?: string };
 type Integration = { id: string; name: Pair; impact: Pair; note?: 'Confirmed' | 'Vendor mapping needs confirmation' };
 type Vendor = { id: string; name: Pair; summary?: Pair; integrations: Integration[] };
 type StatusKey = 'planned' | 'upgrade' | 'interruption' | 'restored' | 'postponed' | 'cancelled';
-type TemplateKey = 'service' | 'general';
+type TemplateKey = 'service' | 'general' | 'whatsapp';
 type PendingDraftDelete = { draft: Announcement; order: string[]; token: string; expiresAt: number };
 type GeneralImage = {
   dataUrl: string;
@@ -98,6 +98,8 @@ type Announcement = {
   extraBody: Pair;
   generalMessage: Pair;
   generalContact: Pair;
+  whatsappTitle?: Pair;
+  whatsappClosing?: Pair;
   generalImage: GeneralImage | null;
   updatedAt?: string;
 };
@@ -371,11 +373,19 @@ function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
 
 function newAnnouncementFor(template: TemplateKey): Announcement {
   const next = emptyAnnouncement();
-  if (template === 'general') {
-    next.template = 'general';
+  if (template !== 'service') {
+    next.template = template;
     next.name = 'New announcement';
     next.headerLabel = { ...GENERAL_HEADER_LABEL };
     next.footerLabel = { en: 'Department name', ar: 'اسم القسم' };
+  }
+  if (template === 'whatsapp') {
+    next.name = 'New WhatsApp announcement';
+    next.headerLabel = { en: 'Announcement', ar: 'إعلان' };
+    next.footerLabel = { en: 'tamam family', ar: 'عائلة تمام' };
+    next.generalMessage = { en: '<p>Write your announcement here. Include the key details and any action required.</p>', ar: '<p>اكتب إعلانك هنا، مع توضيح التفاصيل الأساسية وأي إجراء مطلوب.</p>' };
+    next.whatsappTitle = { en: 'Announcement title', ar: 'عنوان الإعلان' };
+    next.whatsappClosing = { en: '', ar: '' };
   }
   return next;
 }
@@ -1395,6 +1405,8 @@ async function prepareGeneralImage(file: File): Promise<GeneralImage> {
 }
 
 async function renderAnnouncementPng(sourceNode: HTMLElement, transparentBackground = false) {
+  const isWhatsApp = sourceNode.classList.contains('whatsapp-template');
+  const exportBackground = isWhatsApp ? '#19d471' : transparentBackground ? 'transparent' : '#fff';
   const exportStage = document.createElement('div');
   exportStage.style.cssText = `position:absolute;left:-100000px;top:0;width:1920px;background:${transparentBackground ? 'transparent' : '#fff'};overflow:visible;`;
 
@@ -1406,7 +1418,7 @@ async function renderAnnouncementPng(sourceNode: HTMLElement, transparentBackgro
     margin: '0',
     overflow: 'visible',
     boxShadow: 'none',
-    backgroundColor: transparentBackground ? 'transparent' : '#fff',
+    backgroundColor: exportBackground,
   });
   if (transparentBackground) {
     const sourceBody = exportNode.querySelector<HTMLElement>('.source-body');
@@ -1445,7 +1457,7 @@ async function renderAnnouncementPng(sourceNode: HTMLElement, transparentBackgro
         margin: '0',
         overflow: 'visible',
         boxShadow: 'none',
-        backgroundColor: transparentBackground ? 'transparent' : '#fff',
+        backgroundColor: exportBackground,
       },
     });
     return { dataUrl, width, height };
@@ -1491,7 +1503,7 @@ export default function Home() {
   const { user, can } = useAccess();
   const [workspaceReady, setWorkspaceReady] = useState(false);
   const [workspaceError, setWorkspaceError] = useState('');
-  const [announcement, setAnnouncement] = useState<Announcement>(() => can('template.service') ? emptyAnnouncement() : newAnnouncementFor('general'));
+  const [announcement, setAnnouncement] = useState<Announcement>(() => can('template.service') ? emptyAnnouncement() : newAnnouncementFor(can('template.general') ? 'general' : 'whatsapp'));
   const [vendors, setVendors] = useState<Vendor[]>(seedVendors);
   const [drafts, setDrafts] = useState<Announcement[]>([]);
   const [pendingDraftDeletes, setPendingDraftDeletes] = useState<PendingDraftDelete[]>([]);
@@ -1619,6 +1631,10 @@ export default function Home() {
   const chooseTemplate = (template: TemplateKey) => {
     if (!can(`template.${template}`)) return;
     if (template === announcement.template) return;
+    if (template === 'whatsapp') {
+      patchAnnouncement({ template, headerLabel: { en: 'Announcement', ar: 'إعلان' }, footerLabel: { en: 'tamam family', ar: 'عائلة تمام' }, name: 'New WhatsApp announcement', whatsappTitle: announcement.whatsappTitle ?? { en: 'Announcement title', ar: 'عنوان الإعلان' }, whatsappClosing: announcement.whatsappClosing ?? { en: '', ar: '' } });
+      return;
+    }
     patchAnnouncement({
       template,
       ...(template === 'general' &&
@@ -1878,7 +1894,7 @@ export default function Home() {
           announcementId: announcement.id,
           announcementName: announcement.name,
           template: announcement.template,
-          status: announcement.template === 'general' ? 'general' : announcement.status,
+          status: announcement.template !== 'service' ? announcement.template : announcement.status,
           source: announcement.source,
           vendorId: isServiceVendor ? currentVendor?.id || null : null,
           vendorEn: isServiceVendor ? currentVendor?.name.en || null : null,
@@ -2040,12 +2056,12 @@ export default function Home() {
     if (!previewRef.current) return;
     setExportOpen(false);
     const { clone, styles } = await buildEmbeddedAnnouncement(previewRef.current);
-    const exportTitle = announcement.template === 'general' ? announcement.name : announcement.title.en;
+    const exportTitle = announcement.template !== 'service' ? announcement.name : announcement.title.en;
     const safeTitle = exportTitle.replace(/[&<>"']/g, (character) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
     })[character] || character);
     const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="only light"><title>${safeTitle}</title><style>${styles}</style></head><body>${clone.outerHTML}</body></html>`;
-    downloadFile(announcement.template === 'general' ? 'tamam-general-message.html' : 'tamam-announcement.html', html, 'text/html');
+    downloadFile(announcement.template === 'whatsapp' ? 'tamam-whatsapp-announcement.html' : announcement.template === 'general' ? 'tamam-general-message.html' : 'tamam-announcement.html', html, 'text/html');
   };
 
   const exportHtmlSnippet = async () => {
@@ -2055,7 +2071,7 @@ export default function Home() {
     const { clone, styles } = await buildEmbeddedAnnouncement(previewRef.current);
     const announcementHtml = clone.outerHTML.replace(/[^\x00-\x7F]/gu, (character) => `&#${character.codePointAt(0)};`);
     const html = `\uFEFF<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="only light"><title>Tamam Announcement</title><style>${styles}</style></head><body>${announcementHtml}</body></html>`;
-    downloadFile(announcement.template === 'general' ? 'tamam-general-message-embed.html' : 'tamam-announcement-embed.html', html, 'text/html;charset=utf-8');
+    downloadFile(announcement.template === 'whatsapp' ? 'tamam-whatsapp-announcement-embed.html' : announcement.template === 'general' ? 'tamam-general-message-embed.html' : 'tamam-announcement-embed.html', html, 'text/html;charset=utf-8');
     setSavedText('HTML snippet downloaded');
   };
 
@@ -2065,9 +2081,13 @@ export default function Home() {
     setExportOpen(false);
     const { dataUrl } = await renderAnnouncementPng(previewRef.current, true);
     const anchor = document.createElement('a');
-    anchor.download = announcement.template === 'general' ? 'tamam-general-message.png' : 'tamam-announcement.png';
-    anchor.href = dataUrl;
+    anchor.download = announcement.template === 'whatsapp' ? 'tamam-whatsapp-announcement.png' : announcement.template === 'general' ? 'tamam-general-message.png' : 'tamam-announcement.png';
+    const imageUrl = URL.createObjectURL(await (await fetch(dataUrl)).blob());
+    anchor.href = imageUrl;
+    document.body.appendChild(anchor);
     anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(imageUrl), 10000);
   };
 
   const exportPdf = async () => {
@@ -2085,7 +2105,7 @@ export default function Home() {
       compress: true,
     });
     pdf.addImage(dataUrl, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-    pdf.save(announcement.template === 'general' ? 'tamam-general-message.pdf' : 'tamam-announcement.pdf');
+    pdf.save(announcement.template === 'whatsapp' ? 'tamam-whatsapp-announcement.pdf' : announcement.template === 'general' ? 'tamam-general-message.pdf' : 'tamam-announcement.pdf');
   };
 
   return (
@@ -2136,6 +2156,10 @@ export default function Home() {
             {can('template.general') && <button type="button" role="radio" aria-checked={announcement.template === 'general'} className={announcement.template === 'general' ? 'active' : ''} onClick={() => chooseTemplate('general')}>
               <b>General bilingual message</b><span>Flexible internal communication</span>
               {announcement.template === 'general' && <Check className="template-selected-check" aria-hidden="true" />}
+            </button>}
+            {can('template.whatsapp') && <button type="button" role="radio" aria-checked={announcement.template === 'whatsapp'} className={announcement.template === 'whatsapp' ? 'active' : ''} onClick={() => chooseTemplate('whatsapp')}>
+              <b>WhatsApp announcement</b><span>Branded image for mobile sharing</span>
+              {announcement.template === 'whatsapp' && <Check className="template-selected-check" aria-hidden="true" />}
             </button>}
           </div>
 
@@ -2263,7 +2287,7 @@ export default function Home() {
               {announcement.generalImage ? <>
                 <div className="general-image-selected">
                   <img src={announcement.generalImage.dataUrl} alt="Selected message" />
-                  <span><b>{announcement.generalImage.name}</b><small>{announcement.generalImage.width} × {announcement.generalImage.height}px · Scroll or pinch on the preview to zoom, then drag</small></span>
+                  <span><b>{announcement.generalImage.name}</b><small>{announcement.generalImage.width} × {announcement.generalImage.height}px · {announcement.template === 'whatsapp' ? 'Full image shown at its original proportions' : 'Scroll or pinch on the preview to zoom, then drag'}</small></span>
                   <Button type="button" variant="outline" size="sm" disabled={generalImageBusy} onClick={() => generalImageInputRef.current?.click()}><ImagePlus /> Replace</Button>
                   <Button type="button" variant="ghost" size="icon" aria-label="Remove message image" title="Remove image" onClick={removeGeneralImage}><X /></Button>
                 </div>
@@ -2291,13 +2315,15 @@ export default function Home() {
             <div className="language-grid general-editor-grid">
               <div className="language-column">
                 <div className="language-label"><span>EN</span> English</div>
+                {announcement.template === 'whatsapp' && <Field label="Title"><Input value={announcement.whatsappTitle?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { en: event.target.value, ar: announcement.whatsappTitle?.ar ?? '' } })} /></Field>}
                 <Field label="Message"><RichTextEditor label="English message" editorId="en" activeEditor={activeMessageEditor} onActivate={setActiveMessageEditor} toolbarHost={messageToolbarHost} value={announcement.generalMessage.en} onChange={(value) => patchPair('generalMessage', 'en', value)} /></Field>
-                <Field label="Contact line"><Input value={announcement.generalContact.en} onChange={(event) => patchPair('generalContact', 'en', event.target.value)} /></Field>
+                {announcement.template === 'whatsapp' ? <Field label="Highlighted closing line" hint="Optional"><Input value={announcement.whatsappClosing?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { en: event.target.value, ar: announcement.whatsappClosing?.ar ?? '' } })} /></Field> : <Field label="Contact line"><Input value={announcement.generalContact.en} onChange={(event) => patchPair('generalContact', 'en', event.target.value)} /></Field>}
               </div>
               <div className="language-column" dir="rtl">
                 <div className="language-label"><span>AR</span> العربية</div>
+                {announcement.template === 'whatsapp' && <Field label="العنوان"><Input dir="rtl" value={announcement.whatsappTitle?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { ar: event.target.value, en: announcement.whatsappTitle?.en ?? '' } })} /></Field>}
                 <Field label="الرسالة"><RichTextEditor label="الرسالة العربية" editorId="ar" activeEditor={activeMessageEditor} onActivate={setActiveMessageEditor} toolbarHost={messageToolbarHost} dir="rtl" value={announcement.generalMessage.ar} onChange={(value) => patchPair('generalMessage', 'ar', value)} /></Field>
-                <Field label="جهة التواصل"><Input value={announcement.generalContact.ar} onChange={(event) => patchPair('generalContact', 'ar', event.target.value)} /></Field>
+                {announcement.template === 'whatsapp' ? <Field label="عبارة ختامية مميزة" hint="اختياري"><Input dir="rtl" value={announcement.whatsappClosing?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { ar: event.target.value, en: announcement.whatsappClosing?.en ?? '' } })} /></Field> : <Field label="جهة التواصل"><Input value={announcement.generalContact.ar} onChange={(event) => patchPair('generalContact', 'ar', event.target.value)} /></Field>}
               </div>
             </div>
           </>}
@@ -2306,7 +2332,7 @@ export default function Home() {
           <div className="form-grid footer-fields">
             <Field label="Footer label"><Input value={announcement.footerLabel.en} onChange={(event) => patchPair('footerLabel', 'en', event.target.value)} /></Field>
             <Field label="نص التذييل" dir="rtl"><Input dir="rtl" value={announcement.footerLabel.ar} onChange={(event) => patchPair('footerLabel', 'ar', event.target.value)} /></Field>
-            <Field label="Website"><Input value={announcement.footerWebsite} onChange={(event) => patchAnnouncement({ footerWebsite: event.target.value })} /></Field>
+            {announcement.template !== 'whatsapp' && <Field label="Website"><Input value={announcement.footerWebsite} onChange={(event) => patchAnnouncement({ footerWebsite: event.target.value })} /></Field>}
           </div>
           </div>
         </aside>
@@ -2315,7 +2341,19 @@ export default function Home() {
           <div className="preview-heading"><div><span className="live-dot" /> <span>Live preview</span></div><span className="preview-size">Bilingual · Auto-updating</span></div>
           <div className="preview-canvas">
           <div className="preview-sheet">
-          {announcement.template === 'service' ? <article className="announcement-card source-template" ref={previewRef}>
+          {announcement.template === 'whatsapp' ? <article className="announcement-card whatsapp-template" ref={previewRef}>
+            <header className="whatsapp-header">
+              <img className="whatsapp-symbol" src="/whatsapp-symbol.svg" alt="" />
+              <div><strong lang="ar" dir="rtl">{announcement.headerLabel.ar}</strong><strong>{announcement.headerLabel.en}</strong></div>
+            </header>
+            {announcement.generalImage && <img className="whatsapp-banner" src={announcement.generalImage.dataUrl} alt={announcement.generalImage.name} />}
+            {(['ar', 'en'] as const).map((lang) => <section key={lang} className="whatsapp-language" lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+              {announcement.whatsappTitle?.[lang]?.trim() && <h2><span>{announcement.whatsappTitle[lang]}</span></h2>}
+              <div className="general-message-copy whatsapp-copy" dangerouslySetInnerHTML={{ __html: legacyMessageToHtml(announcement.generalMessage[lang]) }} />
+              {announcement.whatsappClosing?.[lang]?.trim() && <p className="whatsapp-closing"><span>{announcement.whatsappClosing[lang]}</span></p>}
+            </section>)}
+            <footer className="whatsapp-footer"><span>{announcement.footerLabel.en}</span>{announcement.footerLabel.en && announcement.footerLabel.ar && <span aria-hidden="true"> | </span>}<span dir="rtl" lang="ar">{announcement.footerLabel.ar}</span></footer>
+          </article> : announcement.template === 'service' ? <article className="announcement-card source-template" ref={previewRef}>
             <AnnouncementHeader label={announcement.headerLabel} />
             <div className="source-body">
               <section className="source-language source-english">
@@ -2467,7 +2505,7 @@ export default function Home() {
           </div>}
           <div className="draft-list">{drafts.length ? drafts.map((draft) => <div className="draft-row" key={draft.id}>
             <button className="draft-load" onClick={() => { setAnnouncement(normalizeAnnouncement(draft)); setVendorSearch(vendors.find((vendor) => vendor.id === draft.vendorId)?.name.en || ''); setSavedText('Draft loaded'); setDraftDialog(false); }}>
-              <span><b>{draft.name}</b><small>{draft.template === 'general' ? 'General bilingual message' : draft.title.en}</small></span>
+              <span><b>{draft.name}</b><small>{draft.template === 'whatsapp' ? 'WhatsApp announcement' : draft.template === 'general' ? 'General bilingual message' : draft.title.en}</small></span>
               <em>{draft.updatedAt ? new Date(draft.updatedAt).toLocaleString() : ''}</em>
             </button>
             <Button className="draft-delete" variant="ghost" size="sm" aria-label={`Delete ${draft.name}`} title="Delete draft" onClick={() => deleteDraft(draft.id)}><Trash2 /><span>Delete</span></Button>

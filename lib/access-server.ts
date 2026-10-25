@@ -87,7 +87,7 @@ export async function pageUser(permission?: Permission) {
   return user;
 }
 export function templateAccess(user: SessionUser, template: unknown) {
-  if (!['service', 'general'].includes(String(template)) || !hasPermission(user, `template.${template}` as Permission)) throw new AccessError('Your role does not have access to this template.');
+  if (!['service', 'general', 'whatsapp'].includes(String(template)) || !hasPermission(user, `template.${template}` as Permission)) throw new AccessError('Your role does not have access to this template.');
 }
 export async function createSession(userId: string) {
   const token = hex(crypto.getRandomValues(new Uint8Array(32)));

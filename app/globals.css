@@ -142,7 +142,23 @@
 .footer-fields .field:last-child{grid-column:1/-1}
 
 /* Working controls */
-.template-switch{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+/* Temporary WhatsApp artwork is isolated in public/whatsapp-*.svg for replacement. */
+.announcement-card.whatsapp-template{container-type:inline-size;display:flex;flex-direction:column;gap:0;padding:6% 5% 7%;border-radius:0;background:#19d471 url('/whatsapp-pattern.svg') repeat;background-size:100% auto;color:#fffde6;overflow:hidden}
+.whatsapp-template>*+*{margin-top:5cqw}
+.whatsapp-header{display:flex;align-items:center;justify-content:space-between;gap:5cqw;margin:1cqw 0}
+.whatsapp-symbol{width:33%;height:auto}
+.whatsapp-header>div{display:grid;text-align:right;font-size:4.8cqw;line-height:1.2;font-weight:700;overflow-wrap:anywhere;min-width:0}
+.whatsapp-banner{display:block;width:100%;height:auto;border-radius:2.6cqw}
+.whatsapp-language{padding:2.8cqw;background:rgba(255,253,230,.23);border-radius:2.7cqw;min-width:0;overflow-wrap:anywhere}
+.whatsapp-language h2{margin:0 0 5cqw;font-size:3.6cqw;font-weight:700;line-height:1.4}
+.whatsapp-language h2 span,.whatsapp-closing span{display:inline-block;padding:1.5cqw 2cqw;background:rgba(0,108,61,.13);border-radius:1.4cqw}
+.whatsapp-copy.general-message-copy{padding:0;font-size:3.5cqw;line-height:1.55;font-weight:500}
+.whatsapp-copy.general-message-copy p{margin:0 0 4cqw}
+.whatsapp-copy.general-message-copy p:last-child{margin-bottom:0}
+.whatsapp-copy.general-message-copy ul,.whatsapp-copy.general-message-copy ol{padding-inline-start:5cqw;margin:0 0 4cqw}
+.whatsapp-closing{margin:4cqw 0 0;font-size:3.5cqw;line-height:1.4;font-weight:700}
+.whatsapp-footer{font-size:2.1cqw;font-weight:700;line-height:1.4;white-space:pre-wrap;margin-top:5cqw}
+.template-switch{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px}
 .template-switch button{min-height:66px;display:grid;align-content:center;gap:3px;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:#fbfcfb;color:#43534b;text-align:left;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
 .template-switch button:hover{border-color:#86bca5;background:#f6fbf8}
 .template-switch button.active{border-color:#2b9871;background:#edf8f3;box-shadow:inset 0 0 0 1px #2b9871;color:#155f43}

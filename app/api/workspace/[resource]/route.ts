@@ -15,7 +15,7 @@ export async function GET(_request: Request, context: Context) {
     if (resource === 'drafts') {
       if (!hasPermission(user, 'drafts.manage')) throw new AccessError('You cannot access saved drafts.');
       const rows = await database().prepare('SELECT id, template, payload FROM user_drafts WHERE user_id = ? ORDER BY updated_at DESC LIMIT 100').bind(user.id).all<{ id: string; template: string; payload: string }>();
-      const drafts = await Promise.all(rows.results.filter(row => hasPermission(user, `template.${row.template}` as 'template.general' | 'template.service')).map(async row => {
+      const drafts = await Promise.all(rows.results.filter(row => hasPermission(user, `template.${row.template}` as 'template.general' | 'template.service' | 'template.whatsapp')).map(async row => {
         const object = await bucket().get(row.payload);
         if (!object) throw new Error('Draft content is unavailable');
         return await object.json();

@@ -126,7 +126,7 @@ export async function POST(request: Request, context: Context) {
         if (existing && JSON.parse(existing.permissions).some((p: Permission) => !hasPermission(user, p))) throw new AccessError('Only an administrator can modify this role.');
       }
       if (body.id === user.roleId) throw new AccessError('Ask another administrator to modify your assigned role.', 400);
-      if (permissions.includes('builder.view') && !permissions.includes('template.service') && !permissions.includes('template.general')) throw new AccessError('Builder access requires at least one template.', 400);
+      if (permissions.includes('builder.view') && !permissions.includes('template.service') && !permissions.includes('template.general') && !permissions.includes('template.whatsapp')) throw new AccessError('Builder access requires at least one template.', 400);
       const id = typeof body.id === 'string' ? body.id : crypto.randomUUID();
       await database().prepare(`INSERT INTO access_roles (id, name, description, permissions, created_at) VALUES (?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET name = excluded.name, description = excluded.description, permissions = excluded.permissions`).bind(id, name, description, JSON.stringify(permissions), new Date().toISOString()).run();

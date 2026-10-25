@@ -35,6 +35,7 @@ import { AccountMenu } from '@/components/account-menu';
 
 const statusLabels: Record<string, string> = {
   general: 'General message',
+  whatsapp: 'WhatsApp announcement',
   planned: 'Planned maintenance',
   upgrade: 'Service upgrade',
   interruption: 'Service interruption',
@@ -385,7 +386,7 @@ export default function AuditDashboard() {
             <thead><tr><th>Sent</th><th>Announcement</th><th>Vendor</th><th>Services</th><th>Status</th><th>Schedule</th><th>Duration</th><th>Sent by</th></tr></thead>
             <tbody>{filtered.map((record) => <tr key={record.id}>
               <td>{formatDateTime(record.sentAt)}</td>
-              <td><b>{record.announcementName}</b><small>{record.template === 'general' ? 'General message' : 'Service announcement'}</small></td>
+              <td><b>{record.announcementName}</b><small>{record.template === 'whatsapp' ? 'WhatsApp announcement' : record.template === 'general' ? 'General message' : 'Service announcement'}</small></td>
               <td>{record.vendorEn || '—'}{record.vendorAr && <small dir="rtl">{record.vendorAr}</small>}</td>
               <td>{record.integrations.length ? record.integrations.map((item) => item.nameEn).join(', ') : '—'}</td>
               <td><span className={`audit-status ${record.status}`}>{statusLabels[record.status] || record.status}</span></td>

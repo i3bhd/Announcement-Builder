@@ -9,6 +9,7 @@ export const PERMISSION_GROUPS = [
   { name: 'Templates', items: [
     ['template.service', 'Service announcement'],
     ['template.general', 'General bilingual message'],
+    ['template.whatsapp', 'WhatsApp announcement'],
   ] },
   { name: 'Exports', items: [
     ['export.html', 'HTML and HTML snippet'],
@@ -41,7 +42,7 @@ export function hasPermission(user: SessionUser, permission: Permission) {
 }
 
 export function homeFor(user: SessionUser) {
-  if (hasPermission(user, 'builder.view') && (hasPermission(user, 'template.service') || hasPermission(user, 'template.general'))) return '/';
+  if (hasPermission(user, 'builder.view') && (hasPermission(user, 'template.service') || hasPermission(user, 'template.general') || hasPermission(user, 'template.whatsapp'))) return '/';
   if (hasPermission(user, 'dashboard.view')) return '/dashboard';
   if (hasPermission(user, 'users.manage') || hasPermission(user, 'roles.manage')) return '/admin';
   return '/account';

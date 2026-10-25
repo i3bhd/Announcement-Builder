@@ -307,6 +307,17 @@ const emptyAnnouncement = (): Announcement => {
   };
 };
 
+function whatsappMessageDefaults(message: Pair): Pair {
+  const defaults = {
+    en: '<p>Write your announcement here. Include the key details and any action required.</p>',
+    ar: '<p>اكتب إعلانك هنا، مع توضيح التفاصيل الأساسية وأي إجراء مطلوب.</p>',
+  };
+  return {
+    en: message.en === '<p><strong>Dear Colleagues,</strong></p>' + defaults.en ? defaults.en : message.en,
+    ar: message.ar === '<p><strong>الزميلات والزملاء الأعزاء،</strong></p>' + defaults.ar ? defaults.ar : message.ar,
+  };
+}
+
 const APPLE_EMOJI_IMAGE_BASE = 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64';
 
 function normalizeInlineEmoji(html: string) {
@@ -336,6 +347,10 @@ function legacyMessageToHtml(value: string) {
 
 function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
   const fallback = emptyAnnouncement();
+  const message = {
+    en: legacyMessageToHtml(draft.generalMessage?.en ?? fallback.generalMessage.en),
+    ar: legacyMessageToHtml(draft.generalMessage?.ar ?? fallback.generalMessage.ar),
+  };
   const selectedIntegrationIds = Array.isArray(draft.selectedIntegrationIds)
     ? draft.selectedIntegrationIds
     : fallback.selectedIntegrationIds;
@@ -357,10 +372,7 @@ function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
     template: draft.template || 'service',
     selectedIntegrationIds,
     impacts,
-    generalMessage: {
-      en: legacyMessageToHtml(draft.generalMessage?.en ?? fallback.generalMessage.en),
-      ar: legacyMessageToHtml(draft.generalMessage?.ar ?? fallback.generalMessage.ar),
-    },
+    generalMessage: draft.template === 'whatsapp' ? whatsappMessageDefaults(message) : message,
     generalContact: draft.generalContact || fallback.generalContact,
     generalImage,
     footerLabel: {
@@ -1632,7 +1644,8 @@ export default function Home() {
     if (!can(`template.${template}`)) return;
     if (template === announcement.template) return;
     if (template === 'whatsapp') {
-      patchAnnouncement({ template, headerLabel: { en: 'Announcement', ar: 'إعلان' }, footerLabel: { en: 'tamam family', ar: 'عائلة تمام' }, name: 'New WhatsApp announcement', whatsappTitle: announcement.whatsappTitle ?? { en: 'Announcement title', ar: 'عنوان الإعلان' }, whatsappClosing: announcement.whatsappClosing ?? { en: '', ar: '' } });
+      const generalMessage = whatsappMessageDefaults(announcement.generalMessage);
+      patchAnnouncement({ template, generalMessage, headerLabel: { en: 'Announcement', ar: 'إعلان' }, footerLabel: { en: 'tamam family', ar: 'عائلة تمام' }, name: 'New WhatsApp announcement', whatsappTitle: announcement.whatsappTitle ?? { en: 'Announcement title', ar: 'عنوان الإعلان' }, whatsappClosing: announcement.whatsappClosing ?? { en: '', ar: '' } });
       return;
     }
     patchAnnouncement({

@@ -2328,15 +2328,15 @@ export default function Home() {
             <div className="language-grid general-editor-grid">
               <div className="language-column">
                 <div className="language-label"><span>EN</span> English</div>
-                {announcement.template === 'whatsapp' && <Field label="Title"><Input value={announcement.whatsappTitle?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { en: event.target.value, ar: announcement.whatsappTitle?.ar ?? '' } })} /></Field>}
+                {announcement.template === 'whatsapp' && <Field label="Title"><Input className="whatsapp-emphasis-input" value={announcement.whatsappTitle?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { en: event.target.value, ar: announcement.whatsappTitle?.ar ?? '' } })} /></Field>}
                 <Field label="Message"><RichTextEditor label="English message" editorId="en" activeEditor={activeMessageEditor} onActivate={setActiveMessageEditor} toolbarHost={messageToolbarHost} value={announcement.generalMessage.en} onChange={(value) => patchPair('generalMessage', 'en', value)} /></Field>
-                {announcement.template === 'whatsapp' ? <Field label="Closing line"><Input value={announcement.whatsappClosing?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { en: event.target.value, ar: announcement.whatsappClosing?.ar ?? '' } })} /></Field> : <Field label="Contact line"><Input value={announcement.generalContact.en} onChange={(event) => patchPair('generalContact', 'en', event.target.value)} /></Field>}
+                {announcement.template === 'whatsapp' ? <Field label="Closing line"><Input className="whatsapp-emphasis-input" value={announcement.whatsappClosing?.en ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { en: event.target.value, ar: announcement.whatsappClosing?.ar ?? '' } })} /></Field> : <Field label="Contact line"><Input value={announcement.generalContact.en} onChange={(event) => patchPair('generalContact', 'en', event.target.value)} /></Field>}
               </div>
               <div className="language-column" dir="rtl">
                 <div className="language-label"><span>AR</span> العربية</div>
-                {announcement.template === 'whatsapp' && <Field label="العنوان"><Input dir="rtl" value={announcement.whatsappTitle?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { ar: event.target.value, en: announcement.whatsappTitle?.en ?? '' } })} /></Field>}
+                {announcement.template === 'whatsapp' && <Field label="العنوان"><Input className="whatsapp-emphasis-input" dir="rtl" value={announcement.whatsappTitle?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappTitle: { ar: event.target.value, en: announcement.whatsappTitle?.en ?? '' } })} /></Field>}
                 <Field label="الرسالة"><RichTextEditor label="الرسالة العربية" editorId="ar" activeEditor={activeMessageEditor} onActivate={setActiveMessageEditor} toolbarHost={messageToolbarHost} dir="rtl" value={announcement.generalMessage.ar} onChange={(value) => patchPair('generalMessage', 'ar', value)} /></Field>
-                {announcement.template === 'whatsapp' ? <Field label="عبارة ختامية"><Input dir="rtl" value={announcement.whatsappClosing?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { ar: event.target.value, en: announcement.whatsappClosing?.en ?? '' } })} /></Field> : <Field label="جهة التواصل"><Input value={announcement.generalContact.ar} onChange={(event) => patchPair('generalContact', 'ar', event.target.value)} /></Field>}
+                {announcement.template === 'whatsapp' ? <Field label="عبارة ختامية"><Input className="whatsapp-emphasis-input" dir="rtl" value={announcement.whatsappClosing?.ar ?? ''} onChange={(event) => patchAnnouncement({ whatsappClosing: { ar: event.target.value, en: announcement.whatsappClosing?.en ?? '' } })} /></Field> : <Field label="جهة التواصل"><Input value={announcement.generalContact.ar} onChange={(event) => patchPair('generalContact', 'ar', event.target.value)} /></Field>}
               </div>
             </div>
           </>}
@@ -2361,9 +2361,9 @@ export default function Home() {
             </header>
             {announcement.generalImage && <img className="whatsapp-banner" src={announcement.generalImage.dataUrl} alt={announcement.generalImage.name} />}
             {(['ar', 'en'] as const).map((lang) => <section key={lang} className="whatsapp-language" lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              {announcement.whatsappTitle?.[lang]?.trim() && <h2><span>{announcement.whatsappTitle[lang]}</span></h2>}
+              {announcement.whatsappTitle?.[lang]?.trim() && <h2><strong>{announcement.whatsappTitle[lang]}</strong></h2>}
               <div className="general-message-copy whatsapp-copy" dangerouslySetInnerHTML={{ __html: legacyMessageToHtml(announcement.generalMessage[lang]) }} />
-              {announcement.whatsappClosing?.[lang]?.trim() && <p className="whatsapp-closing"><span>{announcement.whatsappClosing[lang]}</span></p>}
+              {announcement.whatsappClosing?.[lang]?.trim() && <p className="whatsapp-closing"><strong>{announcement.whatsappClosing[lang]}</strong></p>}
             </section>)}
             <footer className="whatsapp-footer"><span>{announcement.footerLabel.en}</span>{announcement.footerLabel.en && announcement.footerLabel.ar && <span aria-hidden="true"> | </span>}<span dir="rtl" lang="ar">{announcement.footerLabel.ar}</span></footer>
           </article> : announcement.template === 'service' ? <article className="announcement-card source-template" ref={previewRef}>

@@ -139,7 +139,7 @@
 .general-message-copy ul:last-child,.general-message-copy ol:last-child{margin-bottom:0}
 .general-message-copy strong{font-weight:700}
 .header-fields,.footer-fields{margin-top:0}
-.footer-fields .field:last-child{grid-column:1/-1}
+.footer-fields .field:nth-child(3){grid-column:1/-1}
 
 /* Working controls */
 /* Temporary WhatsApp artwork is isolated in public/whatsapp-*.svg for replacement. */

@@ -31,7 +31,7 @@ export default function LoginForm({ setup }: { setup: boolean }) {
     <section className="login-brand">
       <img className="login-logo" src="/tamam-logo.svg" alt="Tamam" />
       <div className="login-brand-copy"><span className="login-kicker">TAMAM ANNOUNCEMENT BUILDER</span><h1>Create announcements.<br />Simply and clearly.</h1><div className="login-brand-caption">Prepare Arabic and English announcements with ready-to-use templates and flexible formatting.</div></div>
-      <div className="login-brand-footer"><span>Announcement Builder</span></div>
+      <div className="login-brand-footer"><span>Internal communication workspace</span></div>
     </section>
     <section className="login-content"><div className="login-card">
       <div className="login-icon">{setup ? <ShieldCheck /> : <LockKeyhole />}</div>
@@ -47,6 +47,6 @@ export default function LoginForm({ setup }: { setup: boolean }) {
         <Button type="submit" className="login-submit" disabled={busy}>{busy ? 'Please wait…' : setup ? 'Create IT administrator' : 'Sign in'}<ArrowRight /></Button>
       </form>
       <div className="login-help">{setup ? 'The setup key protects creation of your first administrator account.' : 'Need access or a password reset? Contact your IT administrator.'}</div>
-    </div><p className="login-copyright">Tamam · Internal communication workspace</p></section>
+    </div></section>
   </main>;
 }

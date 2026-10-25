@@ -143,7 +143,7 @@
 
 /* Working controls */
 /* WhatsApp artwork reuses the existing Tamam logo flourish and header pattern. */
-.announcement-card.whatsapp-template{container-type:inline-size;display:flex;flex-direction:column;gap:0;padding:7.5% 5%;border-radius:0;background:#1EDC73 url('/whatsapp-pattern.svg') repeat;background-size:180% auto;background-position:center top;background-origin:border-box;background-clip:border-box;color:#FFFFE6;overflow:hidden}
+.announcement-card.whatsapp-template{container-type:inline-size;display:flex;flex-direction:column;gap:0;padding:7.5% 5%;border-radius:0;background-color:#1EDC73;background-image:linear-gradient(180deg,#1EDC73 0%,rgba(30,220,115,.85) 18%,rgba(30,220,115,.3) 45%,rgba(30,220,115,0) 70%),url('/whatsapp-pattern.svg');background-size:100% 100%,115% auto;background-position:center top;background-repeat:no-repeat,repeat;background-origin:border-box;background-clip:border-box;color:#FFFFE6;overflow:hidden}
 .whatsapp-template>*+*{margin-top:5.555556cqw}
 .whatsapp-header{display:flex;align-items:center;justify-content:space-between;gap:5cqw;margin:0}
 .whatsapp-symbol{width:33%;height:auto}

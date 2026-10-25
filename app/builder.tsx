@@ -307,6 +307,13 @@ const emptyAnnouncement = (): Announcement => {
   };
 };
 
+function whatsappTitleDefaults(title?: Pair): Pair {
+  return {
+    en: title?.en === undefined || title.en === 'Announcement title' ? 'Title' : title.en,
+    ar: title?.ar === undefined || title.ar === 'عنوان الإعلان' ? 'عنوان' : title.ar,
+  };
+}
+
 function whatsappMessageDefaults(message: Pair): Pair {
   const defaults = {
     en: '<p>Write your announcement here. Include the key details and any action required.</p>',
@@ -373,6 +380,7 @@ function normalizeAnnouncement(draft: Partial<Announcement>): Announcement {
     selectedIntegrationIds,
     impacts,
     generalMessage: draft.template === 'whatsapp' ? whatsappMessageDefaults(message) : message,
+    whatsappTitle: draft.template === 'whatsapp' ? whatsappTitleDefaults(draft.whatsappTitle) : draft.whatsappTitle,
     generalContact: draft.generalContact || fallback.generalContact,
     generalImage,
     footerLabel: {
@@ -396,7 +404,7 @@ function newAnnouncementFor(template: TemplateKey): Announcement {
     next.headerLabel = { en: 'Announcement', ar: 'إعلان' };
     next.footerLabel = { en: 'tamam family', ar: 'عائلة تمام' };
     next.generalMessage = { en: '<p>Write your announcement here. Include the key details and any action required.</p>', ar: '<p>اكتب إعلانك هنا، مع توضيح التفاصيل الأساسية وأي إجراء مطلوب.</p>' };
-    next.whatsappTitle = { en: 'Announcement title', ar: 'عنوان الإعلان' };
+    next.whatsappTitle = whatsappTitleDefaults();
     next.whatsappClosing = { en: '', ar: '' };
   }
   return next;
@@ -1645,7 +1653,7 @@ export default function Home() {
     if (template === announcement.template) return;
     if (template === 'whatsapp') {
       const generalMessage = whatsappMessageDefaults(announcement.generalMessage);
-      patchAnnouncement({ template, generalMessage, headerLabel: { en: 'Announcement', ar: 'إعلان' }, footerLabel: { en: 'tamam family', ar: 'عائلة تمام' }, name: 'New WhatsApp announcement', whatsappTitle: announcement.whatsappTitle ?? { en: 'Announcement title', ar: 'عنوان الإعلان' }, whatsappClosing: announcement.whatsappClosing ?? { en: '', ar: '' } });
+      patchAnnouncement({ template, generalMessage, headerLabel: { en: 'Announcement', ar: 'إعلان' }, footerLabel: { en: 'tamam family', ar: 'عائلة تمام' }, name: 'New WhatsApp announcement', whatsappTitle: whatsappTitleDefaults(announcement.whatsappTitle), whatsappClosing: announcement.whatsappClosing ?? { en: '', ar: '' } });
       return;
     }
     patchAnnouncement({

@@ -30,7 +30,7 @@ export default function LoginForm({ setup }: { setup: boolean }) {
   return <main className="login-shell">
     <section className="login-brand">
       <img className="login-logo" src="/tamam-logo.svg" alt="Tamam" />
-      <div className="login-brand-copy"><span className="login-kicker">TAMAM ANNOUNCEMENT BUILDER</span><p dir="rtl" lang="ar">إعداد الإعلانات بكل سهولة.</p><h1>Create announcements.<br />Simply and clearly.</h1><div className="login-brand-caption">Prepare Arabic and English announcements with ready-to-use templates and flexible formatting.</div></div>
+      <div className="login-brand-copy"><span className="login-kicker">TAMAM ANNOUNCEMENT BUILDER</span><h1>Create announcements.<br />Simply and clearly.</h1><div className="login-brand-caption">Prepare Arabic and English announcements with ready-to-use templates and flexible formatting.</div></div>
       <div className="login-brand-footer"><span>Announcement Builder</span></div>
     </section>
     <section className="login-content"><div className="login-card">
